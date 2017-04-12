@@ -12,13 +12,12 @@
     BasicGame.Boot = function (game) {};
 
     var isoGroup, cursorPos, cursor, player;
-    var sprite;
     var bullets;
 
     var fireRate = 100;
     var nextFire = 0;
 
-var init = function () {
+    var init = function () {
     var game = new Phaser.Game(850, 600, Phaser.AUTO, 'test', null, false, true);
 
 
@@ -28,7 +27,6 @@ BasicGame.Boot.prototype =
         game.load.image('tile', 'assets/tile.png');
         game.load.image('tile1', 'assets/ground_tile.png');
         game.time.advancedTiming = true;
-        game.load.image('arrow', 'assets/sprites/arrow.png');
         game.load.image('bullet', 'assets/sprites/purple_ball.png');
 
         // Add and enable the plug-in.
@@ -78,12 +76,10 @@ BasicGame.Boot.prototype =
     bullets.setAll('checkWorldBounds', true);
     bullets.setAll('outOfBoundsKill', true);   
         
-    sprite = game.add.sprite(400, 300, 'arrow');
-    sprite.anchor.set(0.5);
+ 
+    game.physics.enable(player, Phaser.Physics.ARCADE);
 
-    game.physics.enable(sprite, Phaser.Physics.ARCADE);
-
-    sprite.body.allowRotation = false;
+    player.body.allowRotation = false;
     },
     
     update: function () {
@@ -153,7 +149,7 @@ BasicGame.Boot.prototype =
      game.iso.topologicalSort(isoGroup1);
         
         
-     sprite.rotation = game.physics.arcade.angleToPointer(sprite);
+     player.rotation = game.physics.arcade.angleToPointer(player);
 
         
     
@@ -196,7 +192,7 @@ function fire() {
 
         var bullet = bullets.getFirstDead();
 
-        bullet.reset(sprite.x - 8, sprite.y - 8);
+        bullet.reset(player.x - 8, player.y - 8);
 
         game.physics.arcade.moveToPointer(bullet, 300);
     }
