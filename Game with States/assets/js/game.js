@@ -290,6 +290,11 @@ var Game = {
      function killplayer(balls, bullets) {     
             balls.kill();
             bullets.kill();
+         
+            //update score
+            score += 10;
+            scoreText.text = 'Score: ' + score;
+
         }
  
     },
@@ -334,6 +339,14 @@ var Game = {
                 game.physics.arcade.moveToPointer(bullet, 300);
             }
 
+    }
+
+    //Function to update highscore if needed
+    function updatehighscore(){
+        if(score > highscore){
+            highscore = score;
+            localStorage.highscore;
+        }
     }
 
     //This is the pause function
