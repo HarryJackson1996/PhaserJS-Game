@@ -9,12 +9,15 @@ var turret;
 var fireRate = 100;
 var nextFire = 0;
 var speed = 100;
-var score = 0;
+var highscore = 0;
+var score;
+var scoreText;
+var highscoreText;
 var w = 850, h = 600;
 var Game = {
     
 
-//The preloaf function: loading all our images and sprites prior to use
+//The preload function: loading all our images and sprites prior to use
     preload : function () {
     
     game.load.image('tile', './assets/images/tile.png');
@@ -53,7 +56,13 @@ var Game = {
         
         // Provide a 3D position for the cursor
         cursorPos = new Phaser.Plugin.Isometric.Point3(); 
-
+        
+        //Reset the score from the previous game back to 0;
+        score = 0;
+        
+        //Set score text to screen, to be updated.
+        highscoreText = game.add.text(710, 500, 'High Score: '+highscore, {font: '32px', fill: '#fff'});
+        scoreText = game.add.text(710, 450, 'Score: 0', { font: '32px', fill: '#fff' });
         
         // We are creating a player - this is an isometric sprite
         // It is the base of our turret
