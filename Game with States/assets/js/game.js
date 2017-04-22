@@ -13,6 +13,9 @@ var highscore = 0;
 var score;
 var scoreText;
 var highscoreText;
+var bullet;
+var damage = 10;
+var enemyHealth = 50;
 var w = 850, h = 600;
 var Game = {
     
@@ -23,12 +26,16 @@ var Game = {
     game.load.image('tile', './assets/images/tile.png');
     game.load.image('tile1', './assets/images/ground_tile.png');
     game.time.advancedTiming = true;
-    game.load.image('bullet', './assets/images/purple_ball.png');
     game.load.image('turret', './assets/images/turret.png');
     game.load.image('enemy', './assets/images/cubeface.png');
     game.load.image('menu', './assets/images/menu.png');
-    game.load.image('bullet2', './assets/images/star.png');
-   
+    game.load.image('bullet1', './assets/images/ball1.png');
+    game.load.image('bullet2', './assets/images/ball2.png');
+    game.load.image('bullet3', './assets/images/ball3.png');
+    game.load.image('bullet4', './assets/images/ball4.png');
+    game.load.image('bullet5', './assets/images/ball5.png');
+    game.load.image('bullet6', './assets/images/ball6.png');
+     game.load.image('ball', './assets/images/star.png');
     },
 
     
@@ -70,7 +77,7 @@ var Game = {
         // enable isoArcade physics on the player
         // stop it from leaving the world bounds
         // Dont allow player rotation
-        player = game.add.isoSprite(128, 128, 0, 'tile', 0, isoGroup);
+        player = game.add.isoSprite(168, 168, 0, 'tile', 0, isoGroup);
         player.anchor.set(0.5);
         game.physics.isoArcade.enable(player);
         player.body.collideWorldBounds = true
@@ -82,12 +89,12 @@ var Game = {
         // We set its anchor point
         // enable isoArcade physics on the player
         // stop it from leaving the world bounds
-        turret = game.add.isoSprite(126, 126, 0, 'turret', 0,  isoGroup);
+        turret = game.add.isoSprite(168, 168, 0, 'turret', 0,  isoGroup);
         turret.tint = 0x86bfda;
         turret.anchor.set(0.5);
         game.physics.isoArcade.enable(turret);
         turret.body.collideWorldBounds = true
-   
+        game.physics.enable(turret, Phaser.Physics.ARCADE);
          
         // Creating the bullet game group
         // Enable body = allow collisions
@@ -97,20 +104,24 @@ var Game = {
         bullets = game.add.group();
         bullets.enableBody = true;
         bullets.physicsBodyType = Phaser.Physics.ARCADE;  
-        bullets.createMultiple(50, 'bullet');
+        bullets.createMultiple(1, 'bullet1');
         bullets.setAll('checkWorldBounds', true);
         bullets.setAll('outOfBoundsKill', true);   
         
- 
+        heart = game.add.group();
+        heart = game.add.sprite(-10, -10, 'bullet1');
+        game.physics.arcade.enable(heart);
+
+    
         // This is where the floating balls the follow you are created
         // Enable body for collision handling
         // We are currently creating 5 bullets randomly on the map
         balls = game.add.group();
         balls.enableBody = true;
 
-        for (var i = 0; i < 5; i++)
+        for (var i = 0; i < 1; i++)
         {
-        var ball = balls.create(game.world.randomX, game.world.randomY, 'bullet');
+        var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
         }  
     
         
@@ -197,7 +208,8 @@ var Game = {
         
         // This deals with the collision between the bullets and ball enemies
         // We call the killplayer function which will handle the collision
-        game.physics.arcade.overlap(bullets,balls, killplayer, null, this);   
+        game.physics.arcade.overlap(bullets,balls, destroyBalls, null, this);   
+        game.physics.arcade.overlap(heart,balls, killplayer, null, this); 
         
         // Hover effect
         game.iso.unproject(game.input.activePointer.position, cursorPos);
@@ -205,7 +217,6 @@ var Game = {
         // Loop through all tiles and test to see if the 3D position from above intersects with the automatically generated IsoSprite tile bounds.
         isoGroup.forEach(function (tile) {
             var inBounds = tile.isoBounds.containsXY(cursorPos.x, cursorPos.y);
-            
             // If it does, do a little animation and tint change.
             if (!tile.selected && inBounds) {
                 tile.selected = true;
@@ -287,16 +298,25 @@ var Game = {
     }
         
     // The function that deals with the collision of the blue balls and bullets
-     function killplayer(balls, bullets) {     
-            balls.kill();
+     function destroyBalls(bullets, balls) {     
             bullets.kill();
-         
-            //update score
+            enemyHealth = enemyHealth - damage;
+            console.log(enemyHealth);
+            if(enemyHealth <= 0){
+            balls.kill();
             score += 10;
             scoreText.text = 'Score: ' + score;
-
+            }
         }
- 
+         
+  player.addChild(heart);
+        
+      function killplayer(heart, balls) {   
+        console.log("collide");
+            balls.kill();
+           player.destroy();
+          
+        }
     },
 
     
@@ -332,7 +352,7 @@ var Game = {
             {
                 nextFire = game.time.now + fireRate;
 
-                var bullet = bullets.getFirstDead();
+                bullet = bullets.getFirstDead();
                 
                 bullet.reset(player.x - 8, player.y - 8);
 
@@ -375,10 +395,35 @@ var Game = {
                 choiseLabel.text = 'You chose menu item: ' + choisemap[choise];
                 
                 if(choisemap[choise] == 'one'){
-                    console.log("10000");    
-                game.input.onDown.addOnce(changeWeapon, this);
+                console.log("1");    
+                game.input.onDown.addOnce(changeWeapon1, this);
+                damage = 20;
                 }
-                
+                if(choisemap[choise] == 'two'){
+                console.log("2");    
+                game.input.onDown.addOnce(changeWeapon2, this);
+                damage = 30;
+                }
+                if(choisemap[choise] == 'three'){
+                console.log("3");    
+                game.input.onDown.addOnce(changeWeapon3, this);
+                damage = 40;
+                }
+                if(choisemap[choise] == 'four'){
+                console.log("4");    
+                game.input.onDown.addOnce(changeWeapon4, this);
+                damage = 50;
+                }
+                if(choisemap[choise] == 'five'){
+                console.log("5");    
+                game.input.onDown.addOnce(changeWeapon5, this);
+                damage = 60;
+                }
+                if(choisemap[choise] == 'six'){
+                console.log("6");    
+                game.input.onDown.addOnce(changeWeapon6, this);
+                damage = 100;
+                }
             }
             else{
                 // Remove the menu and the label
@@ -393,9 +438,25 @@ var Game = {
 
 
     //This is a weird function 
-    // Basically you can change a sprite mid game using this 
-    // so i used it change the bullet however i couldnt get it work 
+    // Basically you can change a sprite mid game using this function
     // As of now it changes the player sprite (base of turret)
     // this function is called in the above function 
-    function changeWeapon () {    player.loadTexture("bullet2");    player.body.setSize(player.width, player.height);}
+    function changeWeapon1 () {    bullet.loadTexture("bullet1");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
+    function changeWeapon2 () {    bullet.loadTexture("bullet2");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
+    function changeWeapon3 () {    bullet.loadTexture("bullet3");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
+    function changeWeapon4 () {    bullet.loadTexture("bullet4");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
+    function changeWeapon5 () {    bullet.loadTexture("bullet5");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
+    function changeWeapon6 () {    bullet.loadTexture("bullet6");    bullet.body.setSize(bullets.width, bullets.height);
+    }
+
 

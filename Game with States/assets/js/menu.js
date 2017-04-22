@@ -22,8 +22,7 @@ var Menu = {
         rules.anchor.set(0.5, 0.5);
 
         
-       
-        game.add.text(0, 0, "LAST SCORE: "+ score.toString(), { font: "bold 16px sans-serif", fill: "#fff", align: "center"});
+        
         
     },
         
