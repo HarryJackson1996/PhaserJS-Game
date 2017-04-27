@@ -12,14 +12,14 @@ var Menu = {
     create: function () {
         background = game.add.tileSprite(0, 0, 850, 600, 'background');
 
-        var play = game.add.button(450, 200,  'play', this.startGame, this, 5, 4, 5);  
-        play.anchor.set(1, 0.5);
+        var play = game.add.button(250, 200,  'play', this.startGame, this, 5, 4, 5);  
+        play.anchor.set(0.5, 0.5);
         
-        var controls = game.add.button(450, 300, 'controls', this.startGame2, this, 3, 2, 3);
-        controls.anchor.set(1, 0.5);
+        var controls = game.add.button(250, 300, 'controls', this.startGame2, this, 3, 2, 3);
+        controls.anchor.set(0.5, 0.5);
         
-        var rules = game.add.button(450, 400, 'rules', this.startGame3, this, 11, 10, 11);
-        rules.anchor.set(1, 0.5);
+        var rules = game.add.button(250, 400, 'rules', this.startGame3, this, 11, 10, 11);
+        rules.anchor.set(0.5, 0.5);
 
         
         
