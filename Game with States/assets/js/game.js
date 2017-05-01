@@ -441,16 +441,16 @@ var Game = {
     // Basically you can change a sprite mid game using this function
     // As of now it changes the player sprite (base of turret)
     // this function is called in the above function 
-    function changeWeapon1 () {    bullet.loadTexture("bullet1");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon1 () {    bullet.loadTexture("bullet2");    bullet.body.setSize(bullets.width, bullets.height);
     }
 
-    function changeWeapon2 () {    bullet.loadTexture("bullet2");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon2 () {    bullet.loadTexture("bullet3");    bullet.body.setSize(bullets.width, bullets.height);
     }
 
-    function changeWeapon3 () {    bullet.loadTexture("bullet3");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon3 () {    bullet.loadTexture("bullet4");    bullet.body.setSize(bullets.width, bullets.height);
     }
 
-    function changeWeapon4 () {    bullet.loadTexture("bullet4");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon4 () {    bullet.loadTexture("bullet1");    bullet.body.setSize(bullets.width, bullets.height);
     }
 
     function changeWeapon5 () {    bullet.loadTexture("bullet5");    bullet.body.setSize(bullets.width, bullets.height);
