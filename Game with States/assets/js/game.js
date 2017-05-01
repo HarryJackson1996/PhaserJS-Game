@@ -15,7 +15,6 @@ var scoreText;
 var highscoreText;
 var bullet;
 var damage = 10;
-var enemyHealth = 50;
 var w = 850, h = 600;
 var Game = {
     
@@ -23,10 +22,11 @@ var Game = {
 //The preload function: loading all our images and sprites prior to use
     preload : function () {
     
-    game.load.image('tile', './assets/images/tile.png');
+    game.load.image('tile', './assets/images/tile4.png');
+    game.load.image('tile2', './assets/images/tile3.png');
     game.load.image('tile1', './assets/images/ground_tile.png');
     game.time.advancedTiming = true;
-    game.load.image('turret', './assets/images/turret.png');
+    game.load.image('turret', './assets/images/turret1.png');
     game.load.image('enemy', './assets/images/cubeface.png');
     game.load.image('menu', './assets/images/menu.png');
     game.load.image('bullet1', './assets/images/ball1.png');
@@ -54,7 +54,7 @@ var Game = {
         isoGroup = game.add.group();
         isoGroup1 = game.add.group();
 
-        game.iso.anchor.setTo(0.47, 0.2);
+        game.iso.anchor.setTo(0.5,0.15);
     
         
         // Call the spawnTiles function in order to make our tiles.
@@ -71,31 +71,35 @@ var Game = {
         highscoreText = game.add.text(710, 500, 'High Score: '+highscore, {font: '32px', fill: '#fff'});
         scoreText = game.add.text(710, 450, 'Score: 0', { font: '32px', fill: '#fff' });
         
+        game.world.bounds.setTo(100, 100, 800, 800);      
         // We are creating a player - this is an isometric sprite
         // It is the base of our turret
         // We set its anchor point
         // enable isoArcade physics on the player
         // stop it from leaving the world bounds
         // Dont allow player rotation
-        player = game.add.isoSprite(168, 168, 0, 'tile', 0, isoGroup);
+        player = game.add.isoSprite(168, 168, 0, 'tile2', 0, isoGroup);
         player.anchor.set(0.5);
         game.physics.isoArcade.enable(player);
         player.body.collideWorldBounds = true
         game.physics.enable(player, Phaser.Physics.ARCADE);
         player.body.allowRotation = false;
     
+        
         // We are creating a turret - this is an isometric sprite
         // It the turret piece on top of the player
         // We set its anchor point
         // enable isoArcade physics on the player
-        // stop it from leaving the world bounds
-        turret = game.add.isoSprite(168, 168, 0, 'turret', 0,  isoGroup);
+        // stop it from leaving the world bounds       
+        turret = game.add.isoSprite(168, 168, 29, 'turret', 0,  isoGroup);
         turret.tint = 0x86bfda;
         turret.anchor.set(0.5);
         game.physics.isoArcade.enable(turret);
         turret.body.collideWorldBounds = true
         game.physics.enable(turret, Phaser.Physics.ARCADE);
-         
+        
+        
+        
         // Creating the bullet game group
         // Enable body = allow collisions
         // set physics type
@@ -103,13 +107,15 @@ var Game = {
         // Create multiple bullets (50)
         bullets = game.add.group();
         bullets.enableBody = true;
-        bullets.physicsBodyType = Phaser.Physics.ARCADE;  
-        bullets.createMultiple(1, 'bullet1');
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet1', 0, false);
+        bullets.setAll('anchor.x', 0.1);
+        bullets.setAll('anchor.y', 1.8);
+        bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
-        bullets.setAll('outOfBoundsKill', true);   
         
         heart = game.add.group();
-        heart = game.add.sprite(-10, -10, 'bullet1');
+        heart = game.add.sprite(-10, -20, 'bullet1');
         game.physics.arcade.enable(heart);
 
     
@@ -119,17 +125,18 @@ var Game = {
         balls = game.add.group();
         balls.enableBody = true;
 
-        for (var i = 0; i < 1; i++)
+        for (var i = 0; i < 3; i++)
         {
         var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
+        enemyHealth = 50;
         }  
     
         
         
         // This is where the blue face enemies are created
         // We are creating 4 for the time being
-        for (var xx = 256; xx > 0; xx -= 160) {
-            for (var yy = 256; yy > 0; yy -= 160) {
+        for (var xx = 256; xx > 0; xx -= 256) {
+            for (var yy = 256; yy > 0; yy -= 256) {
                 
                 // Create a cube using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
@@ -144,9 +151,7 @@ var Game = {
                 enemys.body.collideWorldBounds = true;
                 game.physics.arcade.enable(enemys);
                 
-                // Add a full bounce on the x and y axes, and a bit on the z axis. 
-                enemys.body.bounce.set(1, 1, 0.2);
-
+         
                 // Add some X and Y drag to make cubes slow down after being pushed.
                 enemys.body.drag.set(100, 100, 0);
             }
@@ -308,20 +313,20 @@ var Game = {
             scoreText.text = 'Score: ' + score;
             }
         }
-         
+      
   player.addChild(heart);
-        
+ 
       function killplayer(heart, balls) {   
         console.log("collide");
-            balls.kill();
-           player.destroy();
+        balls.kill();
+        player.kill();
           
         }
     },
 
     
     // Function used for drawing the base tilemap
-    spawnTiles: function () {
+  spawnTiles: function () {
         var tile;
         for (var xx = 0; xx < 408; xx += 38) {
             for (var yy = 0; yy < 408; yy += 38) {
@@ -350,7 +355,7 @@ var Game = {
 
         if (game.time.now > nextFire && bullets.countDead() > 0)
             {
-                nextFire = game.time.now + fireRate;
+                nextFire = game.time.now + 100;
 
                 bullet = bullets.getFirstDead();
                 
@@ -396,32 +401,32 @@ var Game = {
                 
                 if(choisemap[choise] == 'one'){
                 console.log("1");    
-                game.input.onDown.addOnce(changeWeapon1, this);
+                game.input.onDown.add(changeWeapon1, this);
                 damage = 20;
                 }
                 if(choisemap[choise] == 'two'){
                 console.log("2");    
-                game.input.onDown.addOnce(changeWeapon2, this);
+                game.input.onDown.add(changeWeapon2, this);
                 damage = 30;
                 }
                 if(choisemap[choise] == 'three'){
                 console.log("3");    
-                game.input.onDown.addOnce(changeWeapon3, this);
+                game.input.onDown.add(changeWeapon3, this);
                 damage = 40;
                 }
                 if(choisemap[choise] == 'four'){
                 console.log("4");    
-                game.input.onDown.addOnce(changeWeapon4, this);
+                game.input.onDown.add(changeWeapon4, this);
                 damage = 50;
                 }
                 if(choisemap[choise] == 'five'){
                 console.log("5");    
-                game.input.onDown.addOnce(changeWeapon5, this);
+                game.input.onDown.add(changeWeapon5, this);
                 damage = 60;
                 }
                 if(choisemap[choise] == 'six'){
                 console.log("6");    
-                game.input.onDown.addOnce(changeWeapon6, this);
+                game.input.onDown.add(changeWeapon6, this);
                 damage = 100;
                 }
             }
