@@ -13,6 +13,9 @@ var highscore = 0;
 var score;
 var scoreText;
 var highscoreText;
+var j;
+var waves = 1;
+var wavestext;
 var bullet;
 var damage = 10;
 var w = 850, h = 600;
@@ -64,12 +67,26 @@ var Game = {
         // Provide a 3D position for the cursor
         cursorPos = new Phaser.Plugin.Isometric.Point3(); 
         
+        // Create a custom timer
+        timer = game.time.create();
+        
+        // Create a delayed event 30s from now
+        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 30, this.resetTime, this);
+        
+        // Start the timer
+        timer.start();
+        
+        j = 3;
+        
         //Reset the score from the previous game back to 0;
         score = 0;
         
         //Set score text to screen, to be updated.
         highscoreText = game.add.text(710, 500, 'High Score: '+highscore, {font: '32px', fill: '#fff'});
         scoreText = game.add.text(710, 450, 'Score: 0', { font: '32px', fill: '#fff' });
+        
+        //add waves text
+        wavestext = game.add.text(710, 550, 'Wave: ' + waves, {font: '32px', fill: '#fff'});
         
         game.world.bounds.setTo(100, 100, 800, 800);      
         // We are creating a player - this is an isometric sprite
@@ -345,7 +362,39 @@ var Game = {
                     }
                 }
             }
+        },
+    
+     render: function () {
+        // If our timer is running, show the time in a nicely formatted way, else show 'Done!'
+        if (timer.running) {
+            game.debug.text("Next wave spawins in: " + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 450, 580, "#fff");
         }
+        else {
+            game.debug.text("Done!", 450, 580, "#0f0");
+        }
+    },
+    
+    resetTime: function() {
+        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 30, this.resetTime, this);
+        
+        waves++;
+        wavestext.text = 'Wave: ' + waves;
+        
+        j = j+3;
+        
+        for (var i = 0; i < j; i++)
+        {
+        var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
+        enemyHealth = 50;
+        }
+    },
+    
+    formatTime: function(s) {
+        // Convert seconds (s) to a nicely formatted and padded time string
+        var minutes = "0" + Math.floor(s / 60);
+        var seconds = "0" + (s - minutes * 60);
+        return minutes.substr(-2) + ":" + seconds.substr(-2);   
+    }
     
 
     };
