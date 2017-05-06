@@ -14,31 +14,34 @@ var score;
 var scoreText;
 var highscoreText;
 var j;
-var waves = 1;
+var waves = 0;
 var wavestext;
 var bullet;
 var damage = 10;
 var w = 850, h = 600;
+var money = 0;
 var Game = {
     
 
 //The preload function: loading all our images and sprites prior to use
     preload : function () {
     
-    game.load.image('tile', './assets/images/tile4.png');
+    game.load.image('tile', './assets/images/tile45.png');
     game.load.image('tile2', './assets/images/tile3.png');
     game.load.image('tile1', './assets/images/ground_tile.png');
     game.time.advancedTiming = true;
-    game.load.image('turret', './assets/images/turret1.png');
-    game.load.image('enemy', './assets/images/cubeface.png');
+    game.load.image('turret', './assets/images/turret1.2.png');
     game.load.image('menu', './assets/images/menu.png');
-    game.load.image('bullet1', './assets/images/ball1.png');
+    game.load.image('menu2', './assets/images/menu2.png');
+    game.load.image('menu3', './assets/images/menu3.png');
+    game.load.image('bullet1', './assets/images/ball1.5.png');
     game.load.image('bullet2', './assets/images/ball2.png');
     game.load.image('bullet3', './assets/images/ball3.png');
     game.load.image('bullet4', './assets/images/ball4.png');
     game.load.image('bullet5', './assets/images/ball5.png');
     game.load.image('bullet6', './assets/images/ball6.png');
      game.load.image('ball', './assets/images/star.png');
+    game.load.spritesheet('Key', './assets/images/ball1.2.png', 23, 18);
     },
 
     
@@ -57,7 +60,7 @@ var Game = {
         isoGroup = game.add.group();
         isoGroup1 = game.add.group();
 
-        game.iso.anchor.setTo(0.5,0.15);
+        game.iso.anchor.setTo(0.53,0.15);
     
         
         // Call the spawnTiles function in order to make our tiles.
@@ -71,22 +74,26 @@ var Game = {
         timer = game.time.create();
         
         // Create a delayed event 30s from now
-        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 30, this.resetTime, this);
+        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 5, this.resetTime, this);
         
         // Start the timer
+        
         timer.start();
         
-        j = 3;
+        j = 1;
         
         //Reset the score from the previous game back to 0;
         score = 0;
         
         //Set score text to screen, to be updated.
-        highscoreText = game.add.text(710, 500, 'High Score: '+highscore, {font: '32px', fill: '#fff'});
-        scoreText = game.add.text(710, 450, 'Score: 0', { font: '32px', fill: '#fff' });
+        highscoreText = game.add.text(10, 550, 'High Score: '+highscore, {font: '20px Arial', fill: '#fff'});
+        scoreText = game.add.text(10, 50, 'Score: 0', { font: '20px Arial', fill: '#33cc00' });
         
         //add waves text
-        wavestext = game.add.text(710, 550, 'Wave: ' + waves, {font: '32px', fill: '#fff'});
+        wavestext = game.add.text(10, 90, 'Wave: ' + waves, {font: '20px Arial', fill: '#b32d00'});
+        
+        moneyText = game.add.text(10, 10, 'Scraps: ' + money, {font: '20px Arial', fill: '#ffff66'});
+        
         
         game.world.bounds.setTo(100, 100, 800, 800);      
         // We are creating a player - this is an isometric sprite
@@ -108,7 +115,7 @@ var Game = {
         // We set its anchor point
         // enable isoArcade physics on the player
         // stop it from leaving the world bounds       
-        turret = game.add.isoSprite(168, 168, 29, 'turret', 0,  isoGroup);
+        turret = game.add.isoSprite(169, 168, 29, 'turret', 0,  isoGroup);
         turret.tint = 0x86bfda;
         turret.anchor.set(0.5);
         game.physics.isoArcade.enable(turret);
@@ -126,14 +133,17 @@ var Game = {
         bullets.enableBody = true;
         bullets.physicsBodyType = Phaser.Physics.ARCADE;
         bullets.createMultiple(2, 'bullet1', 0, false);
-        bullets.setAll('anchor.x', 0.1);
-        bullets.setAll('anchor.y', 1.8);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
         bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
         
         heart = game.add.group();
-        heart = game.add.sprite(-10, -20, 'bullet1');
+        heart = game.add.sprite(-11, -21, 'Key');
         game.physics.arcade.enable(heart);
+        heart.animations.add('walk');
+
+        heart.animations.play('walk', 5, true);
 
     
         // This is where the floating balls the follow you are created
@@ -141,40 +151,6 @@ var Game = {
         // We are currently creating 5 bullets randomly on the map
         balls = game.add.group();
         balls.enableBody = true;
-
-        for (var i = 0; i < 3; i++)
-        {
-        var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
-        enemyHealth = 50;
-        }  
-    
-        
-        
-        // This is where the blue face enemies are created
-        // We are creating 4 for the time being
-        for (var xx = 256; xx > 0; xx -= 256) {
-            for (var yy = 256; yy > 0; yy -= 256) {
-                
-                // Create a cube using the new game.add.isoSprite factory method at the specified position.
-                // The last parameter is the group you want to add it to (just like game.add.sprite)
-                enemys = game.add.isoSprite(xx, yy, 0, 'enemy', 20, isoGroup);
-                enemys.anchor.set(0.5);
-
-                // Enable the physics body on this cube.
-                game.physics.isoArcade.enable(enemys);
-                enemys.enableBody = true;
-                
-                // Collide with the world bounds so it doesn't go falling forever or fly off the screen!
-                enemys.body.collideWorldBounds = true;
-                game.physics.arcade.enable(enemys);
-                
-         
-                // Add some X and Y drag to make cubes slow down after being pushed.
-                enemys.body.drag.set(100, 100, 0);
-            }
-        }
-    
-        
         
         
         // This is where we add cursors to our game allowing movement
@@ -195,7 +171,7 @@ var Game = {
     
         
         // Creating the pause button prototype
-        pause_label = game.add.text(w - 100, 20, 'Pause', { font: '24px Arial', fill: '#fff' });
+        pause_label = game.add.sprite(w - 170, 10, 'menu3');
         pause_label.inputEnabled = true;
         pause_label.events.onInputUp.add(function () {
         
@@ -207,12 +183,14 @@ var Game = {
         // Set its anchor point
         menu = game.add.sprite(w/2, h/2, 'menu');
         menu.anchor.setTo(0.5, 0.5);
+        menu2 = game.add.sprite(w/2, h-520, 'menu2');
+        menu2.anchor.setTo(0.5, 0.5);
 
        
         // And a label to illustrate which menu item was chosen. (This is not necessary)
         // good indicator as of now to see what box has been clicked 
         // this will later on become the shop
-        choiseLabel = game.add.text(w/2, h-50, 'Click outside menu to continue', { font: '30px Arial', fill: '#fff' });
+        choiseLabel = game.add.text(425, 80, 'Click outside menu to continue', { font: '20px Arial', fill: '#fff' });
         choiseLabel.anchor.setTo(0.5, 0.5);
         
     });   
@@ -308,10 +286,21 @@ var Game = {
     turret.rotation = game.physics.arcade.angleToPointer(turret);
         
     //This deals with the balls and hows they move towards the player
+    if(waves == 1 || waves == 2 || waves == 3){
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 500, 250, 250);
+        this.accelerateToObject(balls, player, 300, 250, 250);
     }, game.physics.arcade);
-    
+    }
+    if(waves == 4 || waves == 5 || waves == 6){
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 600, 250, 250);
+    }, game.physics.arcade);
+    }
+    if(waves == 7 || waves == 8 || waves == 9){
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 900, 250, 250);
+    }, game.physics.arcade);
+    }
         
     // This is how the bullets are fired, calls the fire function that handles it
     if (game.input.activePointer.isDown)
@@ -327,7 +316,9 @@ var Game = {
             if(enemyHealth <= 0){
             balls.kill();
             score += 10;
+            money += 10;
             scoreText.text = 'Score: ' + score;
+            moneyText.text = 'Scraps: ' + money;
             }
         }
       
@@ -337,6 +328,13 @@ var Game = {
         console.log("collide");
         balls.kill();
         player.kill();
+        heart = game.add.group();
+        heart = game.add.sprite(turret.x, turret.y+45, 'Key');
+        game.physics.arcade.enable(heart);
+        heart.animations.add('walk');
+
+        heart.animations.play('walk', 5, true);
+      //  game.state.start('Game_Over');
           
         }
     },
@@ -367,26 +365,36 @@ var Game = {
      render: function () {
         // If our timer is running, show the time in a nicely formatted way, else show 'Done!'
         if (timer.running) {
-            game.debug.text("Next wave spawins in: " + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 450, 580, "#fff");
+            game.debug.text("Next wave spawns in: " + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 250, 570, "#b32d00", '24px Arial' );
         }
         else {
-            game.debug.text("Done!", 450, 580, "#0f0");
+            game.debug.text("Done!", 450, 560, "#0f0");
         }
+         
+        // game.add.text(425, 50, 'Click outside menu to continue', { font: '30px Arial', fill: '#fff' });
     },
     
     resetTime: function() {
-        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 30, this.resetTime, this);
+        timer = game.time.create();
+        
+        // Create a delayed event 30s from now
+        timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 5, this.resetTime, this);
+        
+        // Start the timer
+        
+        timer.start();
         
         waves++;
         wavestext.text = 'Wave: ' + waves;
         
-        j = j+3;
+        j = 1;
         
         for (var i = 0; i < j; i++)
         {
         var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
-        enemyHealth = 50;
+        enemyHealth = 10;
         }
+        
     },
     
     formatTime: function(s) {
@@ -450,38 +458,98 @@ var Game = {
                 
                 if(choisemap[choise] == 'one'){
                 console.log("1");    
+                if(money >= 10){
                 game.input.onDown.add(changeWeapon1, this);
                 damage = 20;
+                money = money - 10;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased red bullet for: 10';
+                }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
+                    
                 }
                 if(choisemap[choise] == 'two'){
-                console.log("2");    
+                console.log("2");   
+                if(money >= 40){
                 game.input.onDown.add(changeWeapon2, this);
                 damage = 30;
+                money = money - 40;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased yellow bullet for: 40';
+                }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
+                    
                 }
                 if(choisemap[choise] == 'three'){
-                console.log("3");    
+                console.log("3");  
+                if(money >= 100){
                 game.input.onDown.add(changeWeapon3, this);
                 damage = 40;
+                money = money - 100;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased green bullet for: 100';
                 }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
+                }
+                
                 if(choisemap[choise] == 'four'){
-                console.log("4");    
+                console.log("4");
+                if(money >= 200){
                 game.input.onDown.add(changeWeapon4, this);
                 damage = 50;
+                money = money - 200;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased fast bullet for: 200';
                 }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
+                }
+                
                 if(choisemap[choise] == 'five'){
-                console.log("5");    
+                console.log("5"); 
+                if(money >= 300){
                 game.input.onDown.add(changeWeapon5, this);
                 damage = 60;
+                money = money - 300;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased ANGRY bullet for: 300';
                 }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
+                }
+                
                 if(choisemap[choise] == 'six'){
                 console.log("6");    
+                if(money >= 400){
                 game.input.onDown.add(changeWeapon6, this);
                 damage = 100;
+                money = money - 400;
+                moneyText.text = 'Scraps: ' + money;
+                choiseLabel.text = 'You purchased SUPER bullet for: 400';
+                }
+                else{
+                 console.log("false");
+                 choiseLabel.text = 'NOT ENOUGH SCRAPS!';
+                }
                 }
             }
             else{
                 // Remove the menu and the label
                 menu.destroy();
+                menu2.destroy();
                 choiseLabel.destroy();
 
                 // Unpause the game
@@ -495,22 +563,75 @@ var Game = {
     // Basically you can change a sprite mid game using this function
     // As of now it changes the player sprite (base of turret)
     // this function is called in the above function 
-    function changeWeapon1 () {    bullet.loadTexture("bullet2");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon1 () { 
+        bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet2', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
-    function changeWeapon2 () {    bullet.loadTexture("bullet3");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon2 () {     
+        bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet3', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
-    function changeWeapon3 () {    bullet.loadTexture("bullet4");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon3 () { 
+        bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet4', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
-    function changeWeapon4 () {    bullet.loadTexture("bullet1");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon4 () {     bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet1', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
-    function changeWeapon5 () {    bullet.loadTexture("bullet5");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon5 () {     
+        bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet5', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
-    function changeWeapon6 () {    bullet.loadTexture("bullet6");    bullet.body.setSize(bullets.width, bullets.height);
+    function changeWeapon6 () {   
+        bullets.destroy();
+        bullets = game.add.group();
+        bullets.enableBody = true;
+        bullets.physicsBodyType = Phaser.Physics.ARCADE;
+        bullets.createMultiple(2, 'bullet6', 0, false);
+        bullets.setAll('anchor.x', 0.09);
+        bullets.setAll('anchor.y', 1.5);
+        bullets.setAll('outOfBoundsKill', true);
+        bullets.setAll('checkWorldBounds', true);
     }
 
 
