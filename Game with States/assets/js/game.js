@@ -14,7 +14,7 @@ var score;
 var scoreText;
 var highscoreText;
 var j;
-var waves = 0;
+var waves;
 var wavestext;
 var bullet;
 var damage = 10;
@@ -47,7 +47,7 @@ var Game = {
     
 //the Create function: In this function we are creating our assets by calling the sprites from the preload function
     create : function () {
-    
+        waves = 0;
         //Start the different physics systems, arcade and isoarcade
         //load the isometric plugin
         game.plugins.add(new Phaser.Plugin.Isometric(game));
@@ -334,7 +334,8 @@ var Game = {
         heart.animations.add('walk');
 
         heart.animations.play('walk', 5, true);
-      //  game.state.start('Game_Over');
+        updatehighscore();
+        game.state.start('Game_Over');
           
         }
     },
