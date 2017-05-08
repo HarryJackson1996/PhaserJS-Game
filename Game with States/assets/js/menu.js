@@ -2,9 +2,9 @@ var Menu = {
 
     preload: function () {
         // Load the needed image for this game screen.
-        game.load.spritesheet('play', './assets/images/buttons-moon2.png', 274, 87);
-        game.load.spritesheet('rules', './assets/images/buttons-moon2.png', 274, 87);
-        game.load.spritesheet('controls', './assets/images/buttons-moon2.png', 274, 87);
+        game.load.spritesheet('play', './assets/images/buttons.png', 274, 87);
+        game.load.spritesheet('rules', './assets/images/buttons.png', 274, 87);
+        game.load.spritesheet('controls', './assets/images/buttons.png', 274, 87);
         game.load.image('background', './assets/images/background.png');
         
     },
@@ -41,7 +41,7 @@ var Menu = {
     
      startGame3: function () {
     
-        this.game.state.start('Credits');
+        this.game.state.start('Rules');
     
     },
  

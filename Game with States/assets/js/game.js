@@ -10,16 +10,20 @@ var fireRate = 100;
 var nextFire = 0;
 var speed = 100;
 var highscore = 0;
-var score;
+var score = 0;
 var scoreText;
 var highscoreText;
 var j;
-var waves;
+var waves = 0;
 var wavestext;
+var life = 1;
+var infinity = 10;
 var bullet;
 var damage = 10;
+var bulletSpeed = 0;
 var w = 850, h = 600;
-var money = 0;
+var money = 10000;
+var scoreMultiplyer = 10;
 var Game = {
     
 
@@ -42,12 +46,13 @@ var Game = {
     game.load.image('bullet6', './assets/images/ball6.png');
      game.load.image('ball', './assets/images/star.png');
     game.load.spritesheet('Key', './assets/images/ball1.2.png', 23, 18);
+    game.load.spritesheet('Flash', './assets/images/flash.png', 850, 600);
     },
 
     
 //the Create function: In this function we are creating our assets by calling the sprites from the preload function
     create : function () {
-        waves = 0;
+    
         //Start the different physics systems, arcade and isoarcade
         //load the isometric plugin
         game.plugins.add(new Phaser.Plugin.Isometric(game));
@@ -82,18 +87,22 @@ var Game = {
         
         j = 1;
         
-        //Reset the score from the previous game back to 0;
-        score = 0;
         
         //Set score text to screen, to be updated.
-        highscoreText = game.add.text(10, 550, 'High Score: '+highscore, {font: '20px Arial', fill: '#fff'});
-        scoreText = game.add.text(10, 50, 'Score: 0', { font: '20px Arial', fill: '#33cc00' });
+        highscoreText = game.add.text(700, 560, 'High Score: '+highscore, {font: '25px Agency FB', fill: '#fff'});
+        
+        scoreText = game.add.text(10, 50, 'Score: 0', { font: '25px Agency FB', fill: '#33cc00' });
         
         //add waves text
-        wavestext = game.add.text(10, 90, 'Wave: ' + waves, {font: '20px Arial', fill: '#b32d00'});
+        wavestext = game.add.text(10, 90, 'Wave: ' + waves, {font: '25px Agency FB', fill: '#b32d00'});
         
-        moneyText = game.add.text(10, 10, 'Scraps: ' + money, {font: '20px Arial', fill: '#ffff66'});
+        moneyText = game.add.text(10, 10, 'Scraps: ' + money, {font: '25px Agency FB', fill: '#C0C0C0'});
         
+        speedText = game.add.text(10, 480, 'Player-Speed: ' + speed, {font: '25px Agency FB', fill: '#3BE2F8'});
+        
+        bulletSpeedText = game.add.text(10, 520, 'Bullet-Speed: ' + bulletSpeed, {font: '25px Agency FB', fill: '#3BE2F8'});
+        
+        multiplyerText = game.add.text(10, 560, 'Score-Multiplyer: ' + scoreMultiplyer, {font: '25px Agency FB', fill: '#3BE2F8'});
         
         game.world.bounds.setTo(100, 100, 800, 800);      
         // We are creating a player - this is an isometric sprite
@@ -146,11 +155,15 @@ var Game = {
         heart.animations.play('walk', 5, true);
 
     
+        
+        flash = game.add.group();
+      
+        
         // This is where the floating balls the follow you are created
         // Enable body for collision handling
         // We are currently creating 5 bullets randomly on the map
         balls = game.add.group();
-        balls.enableBody = true;
+        
         
         
         // This is where we add cursors to our game allowing movement
@@ -167,17 +180,21 @@ var Game = {
         ]);
 
 
-
-    
+        //WDA keyboard movement
+        game.input.keyboard.addKey(Phaser.Keyboard.A)
+        game.input.keyboard.addKey(Phaser.Keyboard.D)
+        game.input.keyboard.addKey(Phaser.Keyboard.W)
+        game.input.keyboard.addKey(Phaser.Keyboard.S)
+        game.input.keyboard.addKey(Phaser.Keyboard.P)
+        
         
         // Creating the pause button prototype
         pause_label = game.add.sprite(w - 170, 10, 'menu3');
         pause_label.inputEnabled = true;
-        pause_label.events.onInputUp.add(function () {
-        
+        pause_label.events.onInputUp.add(function ()  {
         // When the pause button is pressed, we pause the game
         game.paused = true;
-
+        
     
         // Then add the menu at point (425,300 = middle of screen)
         // Set its anchor point
@@ -200,7 +217,7 @@ var Game = {
         
         
     },
-    
+   
 
 
     // The update function updates our game as it is played
@@ -249,25 +266,25 @@ var Game = {
     
          // Movement changed for x, y (non iso movement)
          // Up, Down, Left, right movement
-        if (this.cursors.up.isDown) {
+        if (this.cursors.up.isDown  || game.input.keyboard.isDown(Phaser.Keyboard.W)) {
             player.body.velocity.x = -speed;
             player.body.velocity.y = -speed;
             turret.body.velocity.x = -speed;
             turret.body.velocity.y = -speed;
         }
-        else if (this.cursors.down.isDown) {
+        else if (this.cursors.down.isDown || game.input.keyboard.isDown(Phaser.Keyboard.S)) {
             player.body.velocity.x = speed;
             player.body.velocity.y = speed;
             turret.body.velocity.x = speed;
             turret.body.velocity.y = speed;
         }
-        else if (this.cursors.left.isDown) {
+        else if (this.cursors.left.isDown || game.input.keyboard.isDown(Phaser.Keyboard.A)) {
             player.body.velocity.x = -speed;
             player.body.velocity.y = speed;
             turret.body.velocity.x = -speed;
             turret.body.velocity.y = speed;
         }
-       else if (this.cursors.right.isDown) {
+       else if (this.cursors.right.isDown || game.input.keyboard.isDown(Phaser.Keyboard.D)) {
             player.body.velocity.x = speed;
             player.body.velocity.y = -speed;
             turret.body.velocity.x = speed;
@@ -280,6 +297,7 @@ var Game = {
             turret.body.velocity.y = 0;
         }
       
+     
        
         
     //Rotates our turret toward the mouse
@@ -288,17 +306,17 @@ var Game = {
     //This deals with the balls and hows they move towards the player
     if(waves == 1 || waves == 2 || waves == 3){
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 300, 250, 250);
+        this.accelerateToObject(balls, player, 0, 250, 250);
     }, game.physics.arcade);
     }
     if(waves == 4 || waves == 5 || waves == 6){
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 600, 250, 250);
+        this.accelerateToObject(balls, player, 0, 250, 250);
     }, game.physics.arcade);
     }
     if(waves == 7 || waves == 8 || waves == 9){
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 900, 250, 250);
+        this.accelerateToObject(balls, player, 0, 250, 250);
     }, game.physics.arcade);
     }
         
@@ -309,13 +327,15 @@ var Game = {
     }
         
     // The function that deals with the collision of the blue balls and bullets
-     function destroyBalls(bullets, balls) {     
+     function destroyBalls(bullets, balls) {   
+            if(life < infinity){
             bullets.kill();
+            }
             enemyHealth = enemyHealth - damage;
             console.log(enemyHealth);
             if(enemyHealth <= 0){
             balls.kill();
-            score += 10;
+            score = score + scoreMultiplyer;
             money += 10;
             scoreText.text = 'Score: ' + score;
             moneyText.text = 'Scraps: ' + money;
@@ -366,7 +386,7 @@ var Game = {
      render: function () {
         // If our timer is running, show the time in a nicely formatted way, else show 'Done!'
         if (timer.running) {
-            game.debug.text("Next wave spawns in: " + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 250, 570, "#b32d00", '24px Arial' );
+            game.debug.text("Next wave spawns in: " + this.formatTime(Math.round((timerEvent.delay - timer.ms) / 1000)), 300, 570, "#b32d00", '30px Agency FB' );
         }
         else {
             game.debug.text("Done!", 450, 560, "#0f0");
@@ -388,12 +408,17 @@ var Game = {
         waves++;
         wavestext.text = 'Wave: ' + waves;
         
-        j = 1;
+        j = 11;
         
+//balls.destroy();
+  
+        balls.enableBody = true;
         for (var i = 0; i < j; i++)
         {
+  
         var ball = balls.create(game.world.randomX, game.world.randomY, 'ball');
         enemyHealth = 10;
+        
         }
         
     },
@@ -419,7 +444,7 @@ var Game = {
                 
                 bullet.reset(player.x - 8, player.y - 8);
 
-                game.physics.arcade.moveToPointer(bullet, 300);
+                game.physics.arcade.moveToPointer(bullet, 300+bulletSpeed);
             }
 
     }
@@ -456,30 +481,30 @@ var Game = {
                 var choise = Math.floor(x / 180) + 3*Math.floor(y / 180);
                 // Display the choice
                 choiseLabel.text = 'You chose menu item: ' + choisemap[choise];
-                
                 if(choisemap[choise] == 'one'){
                 console.log("1");    
-                if(money >= 10){
-                game.input.onDown.add(changeWeapon1, this);
-                damage = 20;
+                if(money >= 10 && bulletSpeed <= 2000){
+                bulletSpeed = bulletSpeed + 50;
                 money = money - 10;
                 moneyText.text = 'Scraps: ' + money;
+                bulletSpeedText.text = 'Bullet-Speed: ' + bulletSpeed;
                 choiseLabel.text = 'You purchased red bullet for: 10';
                 }
                 else{
                  console.log("false");
                  choiseLabel.text = 'NOT ENOUGH SCRAPS!';
-                }
-                    
+                }  
                 }
                 if(choisemap[choise] == 'two'){
                 console.log("2");   
-                if(money >= 40){
+                if(money >= 40 && scoreMultiplyer < 200){
                 game.input.onDown.add(changeWeapon2, this);
-                damage = 30;
+                scoreMultiplyer = scoreMultiplyer + 10;
                 money = money - 40;
                 moneyText.text = 'Scraps: ' + money;
+                multiplyerText.text = 'Score-Multiplyer: ' + scoreMultiplyer;
                 choiseLabel.text = 'You purchased yellow bullet for: 40';
+                
                 }
                 else{
                  console.log("false");
@@ -489,24 +514,27 @@ var Game = {
                 }
                 if(choisemap[choise] == 'three'){
                 console.log("3");  
-                if(money >= 100){
-                game.input.onDown.add(changeWeapon3, this);
-                damage = 40;
+                if(money >= 100 && speed < 1000){
+                speed = speed + 50;
                 money = money - 100;
+                speedText.text = 'Player-Speed: ' + speed;
                 moneyText.text = 'Scraps: ' + money;
-                choiseLabel.text = 'You purchased green bullet for: 100';
+                choiseLabel.text = 'Purchased Speed upgrade for: 100';
                 }
                 else{
                  console.log("false");
                  choiseLabel.text = 'NOT ENOUGH SCRAPS!';
                 }
+                if(speed > 1000){
+                 console.log("false");
+                 choiseLabel.text = 'MAX speed reached!';   
+                }
                 }
                 
                 if(choisemap[choise] == 'four'){
                 console.log("4");
-                if(money >= 200){
+                if(money >= 200 && speed < 1000){
                 game.input.onDown.add(changeWeapon4, this);
-                damage = 50;
                 money = money - 200;
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'You purchased fast bullet for: 200';
@@ -521,10 +549,10 @@ var Game = {
                 console.log("5"); 
                 if(money >= 300){
                 game.input.onDown.add(changeWeapon5, this);
-                damage = 60;
+                life = 11;
                 money = money - 300;
                 moneyText.text = 'Scraps: ' + money;
-                choiseLabel.text = 'You purchased ANGRY bullet for: 300';
+                choiseLabel.text = 'You purchased infinity cube for: 300';
                 }
                 else{
                  console.log("false");
@@ -535,11 +563,14 @@ var Game = {
                 if(choisemap[choise] == 'six'){
                 console.log("6");    
                 if(money >= 400){
-                game.input.onDown.add(changeWeapon6, this);
-                damage = 100;
+                flash = game.add.sprite(0, 0, 'Flash');
+                flash.animations.add('flicker');
+                flash.animations.play('flicker', 7);
+                game.world.remove(balls);
+                balls = game.add.group();
                 money = money - 400;
                 moneyText.text = 'Scraps: ' + money;
-                choiseLabel.text = 'You purchased SUPER bullet for: 400';
+                choiseLabel.text = 'You purchased Nuke for: 400';
                 }
                 else{
                  console.log("false");
@@ -564,17 +595,6 @@ var Game = {
     // Basically you can change a sprite mid game using this function
     // As of now it changes the player sprite (base of turret)
     // this function is called in the above function 
-    function changeWeapon1 () { 
-        bullets.destroy();
-        bullets = game.add.group();
-        bullets.enableBody = true;
-        bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        bullets.createMultiple(2, 'bullet2', 0, false);
-        bullets.setAll('anchor.x', 0.09);
-        bullets.setAll('anchor.y', 1.5);
-        bullets.setAll('outOfBoundsKill', true);
-        bullets.setAll('checkWorldBounds', true);
-    }
 
     function changeWeapon2 () {     
         bullets.destroy();
@@ -582,18 +602,6 @@ var Game = {
         bullets.enableBody = true;
         bullets.physicsBodyType = Phaser.Physics.ARCADE;
         bullets.createMultiple(2, 'bullet3', 0, false);
-        bullets.setAll('anchor.x', 0.09);
-        bullets.setAll('anchor.y', 1.5);
-        bullets.setAll('outOfBoundsKill', true);
-        bullets.setAll('checkWorldBounds', true);
-    }
-
-    function changeWeapon3 () { 
-        bullets.destroy();
-        bullets = game.add.group();
-        bullets.enableBody = true;
-        bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        bullets.createMultiple(2, 'bullet4', 0, false);
         bullets.setAll('anchor.x', 0.09);
         bullets.setAll('anchor.y', 1.5);
         bullets.setAll('outOfBoundsKill', true);
@@ -622,17 +630,4 @@ var Game = {
         bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
     }
-
-    function changeWeapon6 () {   
-        bullets.destroy();
-        bullets = game.add.group();
-        bullets.enableBody = true;
-        bullets.physicsBodyType = Phaser.Physics.ARCADE;
-        bullets.createMultiple(2, 'bullet6', 0, false);
-        bullets.setAll('anchor.x', 0.09);
-        bullets.setAll('anchor.y', 1.5);
-        bullets.setAll('outOfBoundsKill', true);
-        bullets.setAll('checkWorldBounds', true);
-    }
-
 
