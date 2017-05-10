@@ -103,7 +103,7 @@ var Game = {
         
         timer.start();
         
-        j = 1;
+        j = 0;
         
         
         //Set score text to screen, to be updated.
@@ -325,18 +325,73 @@ var Game = {
         
     //This deals with the balls and hows they move towards the player
     if(waves == 1 || waves == 2 || waves == 3){
+        
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 0, 250, 250);
+        this.accelerateToObject(balls, player, 50, 250, 250);
+        
     }, game.physics.arcade);
     }
     if(waves == 4 || waves == 5 || waves == 6){
+
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 0, 250, 250);
+        this.accelerateToObject(balls, player, 100, 250, 250);
+        
     }, game.physics.arcade);
     }
     if(waves == 7 || waves == 8 || waves == 9){
+        
     balls.forEach( function(balls) {
-        this.accelerateToObject(balls, player, 0, 250, 250);
+        this.accelerateToObject(balls, player, 125, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 10 || waves == 11 || waves == 12){
+        
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 150, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 13 || waves == 14 || waves == 15){
+
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 170, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 16 || waves == 17 || waves == 18 || waves == 19){
+        
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 190, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 20 || waves == 21 || waves == 22){
+        
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 200, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 23 || waves == 24 || waves == 25){
+
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 250, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 26 || waves == 27 || waves == 28 || waves == 29){
+        
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 275, 250, 250);
+        
+    }, game.physics.arcade);
+    }
+    if(waves == 30){
+        
+    balls.forEach( function(balls) {
+        this.accelerateToObject(balls, player, 300, 250, 250);
+        
     }, game.physics.arcade);
     }
         
@@ -376,6 +431,7 @@ var Game = {
 
         heart.animations.play('walk', 5, true);
         updatehighscore();
+        
         game.state.start('Game_Over');
           
         }
@@ -429,7 +485,7 @@ var Game = {
         waves++;
         wavestext.text = 'Wave: ' + waves;
         
-        j = 11;
+        j = j+2;
         
 //balls.destroy();
   
@@ -578,9 +634,9 @@ var Game = {
                 game.input.onDown.add(changeWeapon5, this);
                 life = 11;
                 money = money - 300;
-                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'You purchased infinity cube for: 300';
+                purchaseSound.play();
                 }
                 else{
                  console.log("false");
