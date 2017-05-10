@@ -20,7 +20,8 @@ var Game_Over = {
  
 
         game.add.text(400, 220, "SCORE: "+ score.toString(), { font: "bold 16px Agency FB", fill: "#000000", align: "center"});
-   
+        
+        //reset the global variables
         score = 0;
         waves = 0;
         bulletSpeed = 0;
