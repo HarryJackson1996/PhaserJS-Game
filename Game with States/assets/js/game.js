@@ -24,6 +24,8 @@ var bulletSpeed = 0;
 var w = 850, h = 600;
 var money = 10000;
 var scoreMultiplyer = 10;
+var bulletSound;
+var clearSound;
 var Game = {
     
 
@@ -47,11 +49,16 @@ var Game = {
      game.load.image('ball', './assets/images/star.png');
     game.load.spritesheet('Key', './assets/images/ball1.2.png', 23, 18);
     game.load.spritesheet('Flash', './assets/images/flash.png', 850, 600);
+    game.load.audio('clear',['./assets/sounds/Explosion.mp3','./assets/sounds/Explosion.ogg']);
+    game.load.audio('bullet',['./assets/sounds/Bullet.mp3','./assets/sounds/Bullet.ogg']);
     },
 
     
 //the Create function: In this function we are creating our assets by calling the sprites from the preload function
     create : function () {
+        
+        clearSound = game.add.audio('clear');
+        bulletSound = game.add.audio('bullet');
     
         //Start the different physics systems, arcade and isoarcade
         //load the isometric plugin
@@ -339,6 +346,7 @@ var Game = {
             money += 10;
             scoreText.text = 'Score: ' + score;
             moneyText.text = 'Scraps: ' + money;
+            clearSound.play();
             }
         }
       
@@ -445,6 +453,8 @@ var Game = {
                 bullet.reset(player.x - 8, player.y - 8);
 
                 game.physics.arcade.moveToPointer(bullet, 300+bulletSpeed);
+                
+                bulletSound.play();
             }
 
     }
