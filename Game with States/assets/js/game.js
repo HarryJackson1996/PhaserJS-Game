@@ -1,5 +1,6 @@
 //Initialisation of our global variables
 
+//Main Gameplay Variables
 var isoGroup;
 var cursorPos; 
 var cursor;
@@ -9,13 +10,19 @@ var turret;
 var fireRate = 100;
 var nextFire = 0;
 var speed = 100;
+
+//Score Variables
 var highscore = 0;
 var score = 0;
 var scoreText;
 var highscoreText;
+
+//Waves Variables
 var j;
 var waves = 0;
 var wavestext;
+
+//Misc Gameplay Variables and modifiers
 var life = 1;
 var infinity = 10;
 var bullet;
@@ -24,15 +31,18 @@ var bulletSpeed = 0;
 var w = 850, h = 600;
 var money = 10000;
 var scoreMultiplyer = 10;
+
+//Audio Variables
 var bulletSound;
 var clearSound;
 var clickSound;
 var purchaseSound;
 var music;
+
 var Game = {
     
 
-//The preload function: loading all our images and sprites prior to use
+//The preload function: loading all our images, sprites and audio prior to use
     preload : function () {
     
     game.load.image('tile', './assets/images/tile45.png');
@@ -63,12 +73,14 @@ var Game = {
 //the Create function: In this function we are creating our assets by calling the sprites from the preload function
     create : function () {
         
+        //linking all the audio to variables so they can be played when called on
         music= game.add.audio('music');
         clearSound = game.add.audio('clear');
         bulletSound = game.add.audio('bullet');
         purchaseSound = game.add.audio('purchase');
         clickSound = game.add.audio('click');
         
+        //Loops the game music which is a four bar track that can be looped, sets the volume at 0.6, this loop can be broken with music.stop()
         music.loopFull(0.6);
     
         //Start the different physics systems, arcade and isoarcade
@@ -103,15 +115,16 @@ var Game = {
         
         timer.start();
         
+        //sets the initial number of enemies on screen
         j = 0;
         
         
-        //Set score text to screen, to be updated.
+        //Set score text to screen, these texts are updated when a player destroys an enemy.
         highscoreText = game.add.text(700, 560, 'High Score: '+highscore, {font: '25px Agency FB', fill: '#fff'});
         
         scoreText = game.add.text(10, 50, 'Score: 0', { font: '25px Agency FB', fill: '#33cc00' });
         
-        //add waves text
+        //add text for all local variables that the player needs to know, such as wave and amout of scraps they have to spend
         wavestext = game.add.text(10, 90, 'Wave: ' + waves, {font: '25px Agency FB', fill: '#b32d00'});
         
         moneyText = game.add.text(10, 10, 'Scraps: ' + money, {font: '25px Agency FB', fill: '#C0C0C0'});
@@ -165,6 +178,8 @@ var Game = {
         bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
         
+        //Creating the core game group
+        //add walking animations 
         heart = game.add.group();
         heart = game.add.sprite(-11, -21, 'Key');
         game.physics.arcade.enable(heart);
@@ -324,6 +339,9 @@ var Game = {
     turret.rotation = game.physics.arcade.angleToPointer(turret);
         
     //This deals with the balls and hows they move towards the player
+    //As each wave increases, the number of enemies on screen are increased
+    //By a factor of x+2, the speed is also increased, increasing much faster 
+    //In the begining as there are less enemies on screen.
     if(waves == 1 || waves == 2 || waves == 3){
         
     balls.forEach( function(balls) {
@@ -419,7 +437,7 @@ var Game = {
         }
       
   player.addChild(heart);
- 
+    //function that kills the player, updates the highscore if needed and leads into the Game Over State
       function killplayer(heart, balls) {   
         console.log("collide");
         balls.kill();
@@ -443,7 +461,7 @@ var Game = {
         var tile;
         for (var xx = 0; xx < 408; xx += 38) {
             for (var yy = 0; yy < 408; yy += 38) {
-                // Create a tile using the new game.add.isoSprite factory method at the sspecified position.
+                // Create a tile using the new game.add.isoSprite factory method at the specified position.
                 // The last parameter is the group you want to add it to (just like game.add.sprite)
              
                 if( xx == 0 || yy == 0){
@@ -475,7 +493,7 @@ var Game = {
     resetTime: function() {
         timer = game.time.create();
         
-        // Create a delayed event 30s from now
+        // Create a delayed event 5s from now
         timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 5, this.resetTime, this);
         
         // Start the timer
