@@ -26,6 +26,8 @@ var money = 10000;
 var scoreMultiplyer = 10;
 var bulletSound;
 var clearSound;
+var clickSound;
+var purchaseSound;
 var music;
 var Game = {
     
@@ -53,6 +55,8 @@ var Game = {
     game.load.audio('clear',['./assets/sounds/Explosion.mp3','./assets/sounds/Explosion.ogg']);
     game.load.audio('bullet',['./assets/sounds/Bullet.mp3','./assets/sounds/Bullet.ogg']);
     game.load.audio('music',['./assets/sounds/gme.mp3','./assets/sounds/gme.ogg']);
+    game.load.audio('purchase',['./assets/sounds/Purchase Sound.mp3','./assets/sounds/Purchase_Sound.ogg']);
+    game.load.audio('click',['./assets/sounds/Click Sound.mp3','./assets/sounds/Click_Sound.ogg']);
     },
 
     
@@ -62,6 +66,8 @@ var Game = {
         music= game.add.audio('music');
         clearSound = game.add.audio('clear');
         bulletSound = game.add.audio('bullet');
+        purchaseSound = game.add.audio('purchase');
+        clickSound = game.add.audio('click');
         
         music.loopFull(0.6);
     
@@ -206,6 +212,7 @@ var Game = {
         pause_label.events.onInputUp.add(function ()  {
         // When the pause button is pressed, we pause the game
         game.paused = true;
+        clickSound.play();
         
     
         // Then add the menu at point (425,300 = middle of screen)
@@ -226,6 +233,7 @@ var Game = {
         
         //Unpauses the game
         game.input.onDown.add(unpause, self);
+        clickSound.play();
         
         
     },
@@ -501,6 +509,7 @@ var Game = {
                 if(money >= 10 && bulletSpeed <= 2000){
                 bulletSpeed = bulletSpeed + 50;
                 money = money - 10;
+                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 bulletSpeedText.text = 'Bullet-Speed: ' + bulletSpeed;
                 choiseLabel.text = 'You purchased red bullet for: 10';
@@ -516,6 +525,7 @@ var Game = {
                 game.input.onDown.add(changeWeapon2, this);
                 scoreMultiplyer = scoreMultiplyer + 10;
                 money = money - 40;
+                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 multiplyerText.text = 'Score-Multiplyer: ' + scoreMultiplyer;
                 choiseLabel.text = 'You purchased yellow bullet for: 40';
@@ -532,6 +542,7 @@ var Game = {
                 if(money >= 100 && speed < 1000){
                 speed = speed + 50;
                 money = money - 100;
+                purchaseSound.play();
                 speedText.text = 'Player-Speed: ' + speed;
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'Purchased Speed upgrade for: 100';
@@ -551,6 +562,7 @@ var Game = {
                 if(money >= 200 && speed < 1000){
                 game.input.onDown.add(changeWeapon4, this);
                 money = money - 200;
+                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'You purchased fast bullet for: 200';
                 }
@@ -566,6 +578,7 @@ var Game = {
                 game.input.onDown.add(changeWeapon5, this);
                 life = 11;
                 money = money - 300;
+                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'You purchased infinity cube for: 300';
                 }
@@ -584,6 +597,7 @@ var Game = {
                 game.world.remove(balls);
                 balls = game.add.group();
                 money = money - 400;
+                purchaseSound.play();
                 moneyText.text = 'Scraps: ' + money;
                 choiseLabel.text = 'You purchased Nuke for: 400';
                 }
