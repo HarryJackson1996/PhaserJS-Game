@@ -1,5 +1,6 @@
 //Initialisation of our global variables
 
+//Main Gameplay Variables
 var isoGroup;
 var cursorPos; 
 var cursor;
@@ -9,15 +10,22 @@ var turret;
 var fireRate = 100;
 var nextFire = 0;
 var speed = 100;
+
+
+//Score Variables
 var highscore = 0;
-var newWave = 0;
 var score = 0;
 var scoreText;
 var highscoreText;
+
+//Wave Variables
+var newWave = 0;
 var j;
-var xValue = 0;
 var waves = 0;
 var wavestext;
+
+//Misc Gameplay Variables and modifiers
+var xValue = 0;
 var life = 1;
 var infinity = 10;
 var inf = 1;
@@ -28,6 +36,7 @@ var w = 850, h = 600;
 var money = 900;
 var scoreMultiplier = 10;
 
+//Audio variables
 var bulletSound;
 var clearSound;
 var clickSound;
@@ -38,9 +47,10 @@ var music;
 var Game = {
     
 
-//The preload function: loading all our images and sprites prior to use
+//The preload function: loading all our images, sprites and audio prior to use
     preload : function () {
     
+    //Load in sprites
     game.load.image('tile', './assets/images/tile45.png');
     game.load.image('tile2', './assets/images/tile3.png');
     game.load.image('tile1', './assets/images/ground_tile.png');
@@ -52,10 +62,12 @@ var Game = {
     game.load.image('bullet1', './assets/images/ball1.5.png');
     game.load.image('bullet5', './assets/images/ball5.png');
     game.load.image('ball', './assets/images/spikedball2.png');
+    
+    //Load in spritesheets
     game.load.spritesheet('Key', './assets/images/ball1.2.png', 23, 18);
     game.load.spritesheet('Flash', './assets/images/flash.png', 850, 600);
       
-        
+    //Load in Audio   
     game.load.audio('clear',['./assets/sounds/Explosion.mp3','./assets/sounds/Explosion.ogg']);
     game.load.audio('bullet',['./assets/sounds/Bullet.mp3','./assets/sounds/Bullet.ogg']);
     game.load.audio('music',['./assets/sounds/gme.mp3','./assets/sounds/gme.ogg']);
@@ -68,11 +80,14 @@ var Game = {
 //the Create function: In this function we are creating our assets by calling the sprites from the preload function
     create : function () {
     
+        //linking all the audio to variables so they can be played when called on
         music = game.add.audio('music');
         clearSound = game.add.audio('clear');
         bulletSound = game.add.audio('bullet');
         clickSound = game.add.audio('click');
         purchaseSound = game.add.audio('purchase');
+        
+        //Loops the game music which is a four bar track that can be looped, sets the volume at 0.6, this loop can be broken with music.stop()
         music.loopFull(0.6)
         
         
@@ -104,22 +119,21 @@ var Game = {
         // Create a delayed event 30s from now
         timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 5, this.resetTime, this);
         
-        // Start the timer
-        
+        // Start the timer 
         timer.start();
         
+        //sets the initial number of enemies on screen
         j = 0;
     
         
-        //Set score text to screen, to be updated.
+        //Set score text to screen, to be updated and max wave achieved.
         highscoreText = game.add.text(730, 520, 'Highscore: '+highscore, {font: '25px Agency FB', fill: '#fff'});
         
         highwaveText = game.add.text(730, 560, 'Max wave: '+newWave, {font: '25px Agency FB', fill: '#fff'});
         
-        
+        //add text for all local variables that the player needs to know, such as wave and amout of scraps they have to spend
         scoreText = game.add.text(10, 50, 'Score: 0', { font: '25px Agency FB', fill: '#33cc00' });
         
-        //add waves text
         wavestext = game.add.text(10, 90, 'Wave: ' + waves, {font: '25px Agency FB', fill: '#b32d00'});
         
         moneyText = game.add.text(10, 10, 'Scraps: ' + money, {font: '25px Agency FB', fill: '#C0C0C0'});
@@ -132,7 +146,11 @@ var Game = {
         
         multiplierMoneyText = game.add.text(10, 560, 'Money-Multiplier: ' + xValue + '/8', {font: '25px Agency FB', fill: '#3BE2F8'});
         
+       
+        //Set World Bounds
         game.world.bounds.setTo(100, 100, 800, 800);      
+        
+        
         // We are creating a player - this is an isometric sprite
         // It is the base of our turret
         // We set its anchor point
@@ -174,16 +192,19 @@ var Game = {
         bullets.setAll('anchor.y', 1.5);
         bullets.setAll('outOfBoundsKill', true);
         bullets.setAll('checkWorldBounds', true);
+       
         
+        //Creating the core game group
+        //add blinking animations 
+        //play blinking animation
         heart = game.add.group();
         heart = game.add.sprite(-11, -21, 'Key');
         game.physics.arcade.enable(heart);
-        heart.animations.add('walk');
-
-        heart.animations.play('walk', 5, true);
+        heart.animations.add('blink');
+        heart.animations.play('blink', 5, true);
 
     
-        
+        //Group for playing nuke spritesheet
         flash = game.add.group();
       
         
@@ -196,15 +217,14 @@ var Game = {
         
         // This is where we add cursors to our game allowing movement
         // Added up, down, left, right and spacebar functionality 
-        // 
         this.cursors = game.input.keyboard.createCursorKeys();
         this.game.input.keyboard.addKeyCapture([
             
-            Phaser.Keyboard.LEFT,
-            Phaser.Keyboard.RIGHT,
-            Phaser.Keyboard.UP,
-            Phaser.Keyboard.DOWN,
-            Phaser.Keyboard.SPACEBAR    
+        Phaser.Keyboard.LEFT,
+        Phaser.Keyboard.RIGHT,
+        Phaser.Keyboard.UP,
+        Phaser.Keyboard.DOWN,
+        Phaser.Keyboard.SPACEBAR    
         ]);
 
 
@@ -219,12 +239,11 @@ var Game = {
         // Creating the pause button prototype
         pause_label = game.add.sprite(w - 170, 10, 'menu3');
         pause_label.inputEnabled = true;
-       
         pause_label.events.onInputUp.add(function ()  {
-        // When the pause button is pressed, we pause the game
-                       
+        // When the pause button is pressed, we pause the game              
         game.paused = true;
     
+       
         // Then add the menu at point (425,300 = middle of screen)
         // Set its anchor point
         menu = game.add.sprite(w/2, h/2, 'menu');
@@ -242,7 +261,6 @@ var Game = {
     });   
        
         //Unpauses the game
-
         game.input.onDown.add(unpause, self);
         
         
@@ -332,8 +350,14 @@ var Game = {
         
     //Rotates our turret toward the mouse
     turret.rotation = game.physics.arcade.angleToPointer(turret);
+    //Makes the core the child of the parent player (exact same movement)
+    player.addChild(heart);   
+        
         
     //This deals with the balls and hows they move towards the player
+    //As each wave increases, the number of enemies on screen are increased
+    //By a factor of x+2, the speed is also increased, increasing much faster 
+    //In the begining as there are less enemies on screen.
     if(waves == 1 || waves == 2 || waves == 3){
         
     balls.forEach( function(balls) {
@@ -405,13 +429,19 @@ var Game = {
     }, game.physics.arcade);
     }
         
+      
+        
+     
     // This is how the bullets are fired, calls the fire function that handles it
     if (game.input.activePointer.isDown)
     {
         fire();
-    }
+    }   
         
-    // The function that deals with the collision of the blue balls and bullets
+    //The function that deals with the collision of the balls and bullets
+    //Adds score
+    //Plays sounds
+    //Adds money
      function destroyBalls(bullets, balls) {   
             if(life < infinity){
             bullets.kill();
@@ -429,9 +459,13 @@ var Game = {
             clearSound.play();
             }
         }
-      
-  player.addChild(heart);
- 
+    
+
+      //The function that deals with the collision of the balls and player
+      //kills ball
+      //kills player
+      //Updates highscore by calling 'updatehighscore' function
+      //Starts game over state.
       function killplayer(heart, balls) {   
         console.log("collide");
         balls.kill();
@@ -485,17 +519,19 @@ var Game = {
         timerEvent = timer.add(Phaser.Timer.MINUTE * 0 + Phaser.Timer.SECOND * 5, this.resetTime, this);
         
         // Start the timer
-        
         timer.start();
         
+        //adds one to the waves
+        //updates text
+        //updates wave
+        //adds two to j (amount of enemies)
         waves++;
         wavestext.text = 'Wave: ' + waves;
         updateWave();
+        j = j+2;
         
-         j = j+2;
-        
-//balls.destroy();
-  
+
+        //Creates a new enemies group for each wave
         balls.enableBody = true;
         for (var i = 0; i < j; i++)
         {
@@ -507,6 +543,7 @@ var Game = {
         
     },
     
+    //Function for working out minutes and seconds 
     formatTime: function(s) {
         // Convert seconds (s) to a nicely formatted and padded time string
         var minutes = "0" + Math.floor(s / 60);
@@ -514,10 +551,14 @@ var Game = {
         return minutes.substr(-2) + ":" + seconds.substr(-2);   
     }
     
-
+        
     };
 
-    // Function for firing the bullet
+
+    //Function for firing the bullet
+    //Resets the bullet if bullet not alive
+    //Bullet moves to pointer (click event)
+    //player bulletsound
     function fire() {
 
         if (game.time.now > nextFire && bullets.countDead() > 0)
@@ -574,6 +615,11 @@ var Game = {
                 var choise = Math.floor(x / 180) + 3*Math.floor(y / 180);
                 // Display the choice
         
+                
+                //if player clicks the first item in the shop
+                //decrements money if possible
+                //prints out messages to inform player
+                //updates global variables
                 if(choisemap[choise] == 'one' ){
                 console.log("1"); 
                 if(bulletSpeed <= 200 && money < 10){
@@ -594,6 +640,10 @@ var Game = {
                 }
                 }
                 
+                //If player clicks the second item in the shop
+                //Decrements money if possible
+                //Prints out messages to inform player
+                //Updates global variables
                 if(choisemap[choise] == 'two'){
                 console.log("2"); 
                 if(scoreMultiplier <= 200 && money < 40){
@@ -616,7 +666,10 @@ var Game = {
     
                 }
                 
-                
+                //If player clicks the third item in the shop
+                //Decrements money if possible
+                //Prints out messages to inform player
+                //Updates global variables
                 if(choisemap[choise] == 'three'){
                 console.log("3"); 
                 if(speed <= 200 && money < 100){
@@ -638,7 +691,10 @@ var Game = {
                  
                 }
                 
-                
+                //If player clicks the fourth item in the shop
+                //Decrements money if possible
+                //Prints out messages to inform player
+                //Updates global variables
                 if(choisemap[choise] == 'four'){
                 console.log("4");
                 if(xValue != 8 && money < 200){
@@ -662,7 +718,11 @@ var Game = {
                 
                 }
                 
-                
+                //If player clicks the five item in the shop
+                //Decrements money if possible
+                //Prints out messages to inform player
+                //Updates global variables
+                //Changes bullet sprite
                 if(choisemap[choise] == 'five'){
                 if(money < 300 && inf > 0){
                     choiseLabel.text = 'NOT ENOUGH SCRAPS!';        
@@ -687,7 +747,12 @@ var Game = {
                 }
               
                 
-                 
+                //If player clicks the sixth item in the shop
+                //Decrements money if possible
+                //Prints out messages to inform player
+                //Updates global variables
+                //plays nuke spritesheet
+                //kills all enemies
                 if(choisemap[choise] == 'six'){
                 console.log("6");    
                 if(money >= 400){
@@ -713,7 +778,7 @@ var Game = {
                 }
             }
             else{
-                // Remove the menu and the label
+                // Remove the menu, the label, the second menu and play sound
                 menu.destroy();
                 menu2.destroy();
                 choiseLabel.destroy();
@@ -726,11 +791,9 @@ var Game = {
 
 
     //This is a weird function 
-    // Basically you can change a sprite mid game using this function
-    // As of now it changes the player sprite (base of turret)
-    // this function is called in the above function 
-
-
+    //Basically you can change a sprite mid game using this function
+    //It destroys the bullet group and remakes it with new sprite
+    //This function is called in the above function 
     function changeWeapon5 () { 
         bullets.destroy();
         bullets = game.add.group();

@@ -28,25 +28,33 @@ var Controls = {
     },
 
     create: function () {
+        
+        //Add Audio
         clickSound = game.add.audio('click');
         
+        //Set background images
         background = game.add.tileSprite(0, 0, 850, 600, 'background');
-          
+        
+        //Add Button to go home
         var home = game.add.button(425, 400,  'home', this.startGame, this, 7, 6, 7);  
         home.anchor.set(0.5, 0.5);
         
+        //Add ArrowKey images
         up = game.add.sprite(90,90,'up');
         down = game.add.sprite(90,150,'down');
         left = game.add.sprite(90,210,'left');
         right = game.add.sprite(90,270,'right');
     
+        //Add WASD images
         W = game.add.sprite(190, 90,'W');
         S = game.add.sprite(190, 150,'S');
         A = game.add.sprite(190,210,'A');
         D = game.add.sprite(190,270,'D');
-
+        
+        //Add mouse image
         mouse = game.add.sprite(550, 80,'mouse');
         
+        //Add text for screen
         game.add.text(252, 105, "= MOVE UP", { font: "bold 16px sans-serif", fill: "white", align: "center"});
         game.add.text(252, 165, "= MOVE DOWN", { font: "bold 16px sans-serif", fill: "white", align: "center"});
         game.add.text(252, 225, "= MOVE LEFT", { font: "bold 16px sans-serif", fill: "white", align: "center"});
@@ -63,7 +71,9 @@ var Controls = {
     },
 
 
-    
+    //Start the menu state
+    //plays sound
+    //main menu music stop
     startGame: function () {
         clickSound.play();
         this.game.state.start('Menu');
